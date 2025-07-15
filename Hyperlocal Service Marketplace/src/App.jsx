@@ -3,7 +3,7 @@ import Header from './components/Header';
 import Home from './pages/Home';
 import Services from './pages/Services';
 import BookingPage from './pages/BookingPage';
-import PaymentPage from './pages/Payment'; 
+import PaymentPage from './pages/PaymentPage';
 
 function App() {
   return (
@@ -13,7 +13,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/services" element={<Services />} />
         <Route path="/booking" element={<BookingPage />} /> 
-        <Route path="/payment" element={<PaymentPage />} />  
+        <Route path="/payment" element={<PaymentPage />} />
       </Routes>
     </>
   );
