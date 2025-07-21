@@ -4,6 +4,8 @@ import Home from './pages/Home';
 import Services from './pages/Services';
 import BookingPage from './pages/BookingPage';
 import PaymentPage from './pages/PaymentPage';
+import Login from './pages/Login';
+import Register from './pages/Register';
 
 function App() {
   return (
@@ -14,6 +16,8 @@ function App() {
         <Route path="/services" element={<Services />} />
         <Route path="/booking" element={<BookingPage />} /> 
         <Route path="/payment" element={<PaymentPage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
       </Routes>
     </>
   );
