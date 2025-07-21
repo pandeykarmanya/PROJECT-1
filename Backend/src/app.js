@@ -3,7 +3,7 @@ const cors = require("cors");
 const passport = require("passport");
 const connectDB = require("./config/db");
 const path = require("path");
-
+const providerRoutes = require("./routes/ProviderRoutes");
 // Import routes
 const authRoutes = require("./routes/auth");
 
@@ -32,8 +32,7 @@ require("./config/passport");
 
 // Routes
 app.use("/api/auth", authRoutes);
-
-
+app.use("/api/providers", providerRoutes);
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
