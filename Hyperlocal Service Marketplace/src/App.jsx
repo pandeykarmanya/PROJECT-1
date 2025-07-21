@@ -3,7 +3,7 @@ import Header from './components/Header';
 import Home from './pages/Home';
 import Services from './pages/Services';
 import BookingPage from './pages/BookingPage';
-import PaymentPage from './pages/PaymentPage';
+import PaymentPage from "./pages/payment";
 
 function App() {
   return (
