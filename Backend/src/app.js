@@ -3,10 +3,11 @@ const cors = require("cors");
 const passport = require("passport");
 const connectDB = require("./config/db");
 const path = require("path");
-const providerRoutes = require("./routes/ProviderRoutes");
+
 // Import routes
 const authRoutes = require("./routes/auth");
-
+const providerRoutes = require("./routes/providerRoute")
+ // Add this line
 
 // Initialize app
 const app = express();
@@ -17,7 +18,7 @@ connectDB();
 // Middlewares
 app.use(
   cors({
-    origin: "", // Your frontend URL
+    origin: "", // Replace with your frontend URL or process.env.FRONTEND_URL
     credentials: true,
   })
 );
@@ -28,11 +29,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(passport.initialize());
 require("./config/passport");
 
-
-
 // Routes
 app.use("/api/auth", authRoutes);
-app.use("/api/providers", providerRoutes);
+app.use("api/provid", providerRoutes);
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
