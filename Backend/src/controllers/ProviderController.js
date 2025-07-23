@@ -4,8 +4,7 @@ const User = require("../model/User");
 // Register a new provider profile
 exports.registerProvider = async (req, res) => {
   try {
-    const { skills, location, pricing, availability } = req.body;
-    const userId = req.user.id; // From JWT middleware
+    const { userId, skills, location, pricing, availability } = req.body;
 
     // Check if user exists and has Provider role
     const user = await User.findById(userId);
@@ -28,13 +27,12 @@ exports.registerProvider = async (req, res) => {
       return res.status(400).json({ message: "Location details are required" });
     }
 
-    // Create new provider profile
     const provider = new Provider({
       userId,
       skills,
       location: {
         type: "Point",
-        coordinates: location.coordinates, // [longitude, latitude]
+        coordinates: location.coordinates,
         address: location.address,
       },
       pricing,
@@ -48,22 +46,13 @@ exports.registerProvider = async (req, res) => {
       success: true,
       message:
         "Provider profile registered successfully. Awaiting admin approval.",
-      provider: {
-        id: provider._id,
-        userId: provider.userId,
-        skills: provider.skills,
-        location: provider.location,
-        pricing: provider.pricing,
-        availability: provider.availability,
-        status: provider.status,
-      },
+      provider,
     });
   } catch (error) {
     console.error("Provider registration error:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
 // Update provider profile
 exports.updateProviderProfile = async (req, res) => {
   try {
