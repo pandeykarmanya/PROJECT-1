@@ -16,15 +16,23 @@ export default function Header() {
       <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-5">
 
         {/* LEFT: Logo */}
-        <div className="flex-shrink-0 mr-auto">
+        <div className="flex-shrink-0 mr-auto flex items-center gap-2">
+          <img src="/images/D2D-logo.png" alt="Logo" className="h-8 w-8 object-contain" />
           <Link to="/" className="text-2xl font-bold text-white">D2D Service</Link>
         </div>
 
         {/* CENTER: Navigation Links */}
         <div className="flex gap-8 text-white text-base font-medium">
-          <Link to="/" className="hover:text-[#FE5E41] transition">Home</Link>
-          <Link to="/services" className="hover:text-[#FE5E41] transition">Services</Link>
-        </div>
+  <Link to="/" className="relative group hover:text-[#FE5E41] transition">
+    Home
+    <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-[#FE5E41] transition-all duration-300 group-hover:w-full"></span>
+  </Link>
+  
+  <Link to="/services" className="relative group hover:text-[#FE5E41] transition">
+    Services
+    <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-[#FE5E41] transition-all duration-300 group-hover:w-full"></span>
+  </Link>
+</div>
 
         {/* RIGHT: Search and Profile */}
         <div className="flex items-center gap-4 ml-auto relative">
