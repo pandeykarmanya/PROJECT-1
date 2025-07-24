@@ -4,8 +4,8 @@ import Footer from './components/Footer';
 import Services from './pages/Services';
 import BookingPage from './pages/BookingPage';
 import PaymentPage from './pages/PaymentPage';
-import Login from './pages/Login';
-import Register from './pages/Register';
+import LoginPage from './pages/Login';
+import RegisterPage from './pages/Register';
 import HomePage from './pages/HomePage'; 
 
 function App() {
@@ -17,8 +17,8 @@ function App() {
         <Route path="/services" element={<Services />} />
         <Route path="/booking" element={<BookingPage />} />
         <Route path="/payment" element={<PaymentPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<LoginPage/>} />
+        <Route path="/register" element={<RegisterPage/>} />
       </Routes>
       <Footer/>
     </>

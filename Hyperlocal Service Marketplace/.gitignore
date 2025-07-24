@@ -12,6 +12,16 @@ dist
 dist-ssr
 *.local
 
+node_modules/
+.env
+.DS_Store
+npm-debug.log
+yarn-error.log
+coverage/
+.vscode/
+.idea/
+
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

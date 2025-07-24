@@ -1,82 +1,88 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
+import LoginForm from "../components/components/LoginForm";
 
-export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('');
-
-  const handleLogin = (e) => {
-    e.preventDefault();
-
-    if (email.trim() && password.trim()) {
-      setMessage('✅ Logged in successfully!');
-    } else {
-      setMessage('❌ Please enter email and password.');
-    }
-  };
-
+const LoginPage = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 pt-24 relative overflow-hidden">
-
-      {/* Background blur effect */}
-      <div className="absolute inset-0 bg-white/30 backdrop-blur-sm z-0"></div>
-
-      {/* Login card */}
-      <div className="relative z-10 bg-white p-10 rounded-2xl shadow-2xl w-full max-w-xl">
-        <h2 className="text-3xl font-bold text-center text-[#FE5E41] mb-8">
-          Login
-        </h2>
-
-        <form className="space-y-5" onSubmit={handleLogin}>
-          {/* Email */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email address</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#FE5E41]"
-              placeholder="you@example.com"
-            />
-          </div>
-
-          {/* Password */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#FE5E41]"
-              placeholder="••••••••"
-            />
-          </div>
-
-          {/* Login Button */}
-          <button
-            type="submit"
-            className="w-full py-2 px-4 bg-[#FE5E41] hover:bg-[#e04b32] text-white font-semibold rounded transition"
-          >
-            Login
+    <div className="bg-gray-100 min-h-screen flex items-center justify-center px-4 py-12">
+      <header className="fixed top-0 left-0 w-full bg-teal-900 text-white p-4 flex justify-between items-center">
+        <div className="flex items-center">
+          <img src="/logo.png" alt="D2D Service Logo" className="h-8 mr-2" />
+          <span className="text-xl font-bold">D2D Service</span>
+        </div>
+        <nav className="space-x-4">
+          <a href="/" className="hover:text-orange-300">
+            Home
+          </a>
+          <a href="/services" className="hover:text-orange-300">
+            Services
+          </a>
+        </nav>
+        <div className="flex items-center space-x-4">
+          <input
+            type="text"
+            placeholder="Search services..."
+            className="p-2 rounded-md bg-gray-700 text-white"
+          />
+          <button className="bg-orange-500 hover:bg-orange-600 text-white p-2 rounded-md">
+            Search
           </button>
-        </form>
-
-        {/* Message */}
-        {message && (
-          <p className="text-center mt-4 text-sm font-medium text-gray-700">
-            {message}
-          </p>
-        )}
-
-        {/* Footer Text */}
-        <p className="text-sm text-gray-600 text-center mt-6">
-          Don’t have an account?{' '}
-          <Link to="/Register" className="text-[#FE5E41] font-medium hover:underline">
-            Create
-          </Link>
-        </p>
+          <a href="/register" className="text-orange-500 hover:text-orange-600">
+            Register
+          </a>
+        </div>
+      </header>
+      <div className="mt-20">
+        <LoginForm />
+      </div>
+      <div className="fixed bottom-4 flex space-x-4">
+        <button className="bg-white rounded-full p-2 shadow-md">
+          <svg
+            className="w-6 h-6 text-gray-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+            ></path>
+          </svg>
+        </button>
+        <button className="bg-white rounded-full p-2 shadow-md">
+          <svg
+            className="w-6 h-6 text-gray-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M4 6h16M4 12h16m-7 6h7"
+            ></path>
+          </svg>
+        </button>
+        <button className="bg-white rounded-full p-2 shadow-md">
+          <svg
+            className="w-6 h-6 text-gray-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M13 10V3L4 14h7v7l9-11h-7z"
+            ></path>
+          </svg>
+        </button>
       </div>
     </div>
   );
-}
+};
+
+export default LoginPage;
