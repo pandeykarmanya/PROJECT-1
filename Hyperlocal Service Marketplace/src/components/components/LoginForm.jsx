@@ -28,7 +28,18 @@ const LoginForm = () => {
     try {
       const { user, token } = await login(formData);
       loginUser(user, token);
-      navigate("/dashboard");
+
+      // Redirect based on user role
+      if (user.role === "admin") {
+        navigate("/admin-dashboard");
+      } else if (user.role === "user") {
+        navigate("/user-dashboard");
+      } else if (user.role === "provider") {
+        navigate("/provider-dashboard");
+      } else {
+        // Fallback in case role is unexpected
+        navigate("/dashboard");
+      }
     } catch (err) {
       console.error("Login error:", err);
       setFormError(err.message || "Failed to login. Please try again.");
