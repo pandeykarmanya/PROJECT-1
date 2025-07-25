@@ -33,7 +33,7 @@ const LoginForm = () => {
       if (user.role === "admin") {
         navigate("/admin-dashboard");
       } else if (user.role === "user") {
-        navigate("/user-dashboard");
+        navigate("/");
       } else if (user.role === "provider") {
         navigate("/provider-dashboard");
       } else {
@@ -51,7 +51,7 @@ const LoginForm = () => {
   return (
     <div className="w-full max-w-md mx-auto bg-white rounded-lg shadow-lg p-6">
       <h2 className="text-2xl font-bold text-orange-600 mb-6 text-center">
-        Login to Your Account
+        Login
       </h2>
 
       {formError && (

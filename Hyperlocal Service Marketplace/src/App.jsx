@@ -7,6 +7,9 @@ import PaymentPage from './pages/PaymentPage';
 import LoginPage from './pages/Login';
 import RegisterPage from './pages/Register';
 import HomePage from './pages/HomePage'; 
+import AdminDashboard from './pages/AdminDashboard';
+import ProviderDashboard from "./pages/ProviderDashboard";
+
 
 function App() {
   return (
@@ -19,6 +22,8 @@ function App() {
         <Route path="/payment" element={<PaymentPage />} />
         <Route path="/login" element={<LoginPage/>} />
         <Route path="/register" element={<RegisterPage/>} />
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route path="/provider-dashboard" element={<ProviderDashboard />} />
       </Routes>
       <Footer/>
     </>

@@ -8,7 +8,7 @@ const RegisterPage = () => {
       <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
         <div className="text-center mb-8">
           <Link to="/" className="inline-block"></Link>
-          <p className="text-orange-500 mt-2">Create your account</p>
+          <p className="text-orange-500 mt-2"></p>
         </div>
 
         <RegisterForm />
