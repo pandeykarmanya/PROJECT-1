@@ -8,7 +8,7 @@ exports.registerProvider = async (req, res) => {
 
     // Check if user exists and has Provider role
     const user = await User.findById(userId);
-    if (!user || user.role !== "Provider") {
+    if (!user || user.role !== "provider") {
       return res
         .status(403)
         .json({ message: "User is not authorized as a provider" });
@@ -27,6 +27,17 @@ exports.registerProvider = async (req, res) => {
       return res.status(400).json({ message: "Location details are required" });
     }
 
+    // Transform availability structure to match schema
+    const transformedAvailability = availability.map((slot) => ({
+      day: slot.day,
+      timeSlots: [
+        {
+          start: slot.from,
+          end: slot.to,
+        },
+      ],
+    }));
+
     const provider = new Provider({
       userId,
       skills,
@@ -36,7 +47,7 @@ exports.registerProvider = async (req, res) => {
         address: location.address,
       },
       pricing,
-      availability,
+      availability: transformedAvailability,
       status: "pending",
     });
 
@@ -53,6 +64,7 @@ exports.registerProvider = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
 // Update provider profile
 exports.updateProviderProfile = async (req, res) => {
   try {
@@ -61,7 +73,7 @@ exports.updateProviderProfile = async (req, res) => {
 
     // Check if user is a provider
     const user = await User.findById(userId);
-    if (!user || user.role !== "Provider") {
+    if (!user || user.role !== "provider") {
       return res
         .status(403)
         .json({ message: "User is not authorized as a provider" });
@@ -83,7 +95,18 @@ exports.updateProviderProfile = async (req, res) => {
       };
     }
     if (pricing) provider.pricing = pricing;
-    if (availability) provider.availability = availability;
+    if (availability) {
+      // Transform availability structure to match schema
+      provider.availability = availability.map((slot) => ({
+        day: slot.day,
+        timeSlots: [
+          {
+            start: slot.from || slot.start,
+            end: slot.to || slot.end,
+          },
+        ],
+      }));
+    }
 
     await provider.save();
 
@@ -111,9 +134,9 @@ exports.getProviderProfile = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // Check if user is a provider
+    // Check if user is a provider - FIXED: changed "Provider" to "provider"
     const user = await User.findById(userId);
-    if (!user || user.role !== "Provider") {
+    if (!user || user.role !== "provider") {
       return res
         .status(403)
         .json({ message: "User is not authorized as a provider" });
