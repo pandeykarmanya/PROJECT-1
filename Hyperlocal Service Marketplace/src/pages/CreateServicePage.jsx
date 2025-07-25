@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   ArrowLeft,
   Plus,
@@ -7,14 +7,32 @@ import {
   Clock,
   DollarSign,
   User,
+  Navigation,
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import apiService from "../api/provider";
-import { useNavigate } from "react-router-dom"; // Add useNavigate for redirect
+import { useNavigate } from "react-router-dom";
+
+// Define available service types for dropdowns
+const serviceTypes = [
+  "Plumbing",
+  "Electrical Work",
+  "HVAC",
+  "Carpentry",
+  "Painting",
+  "Beauty Services",
+  "Cleaning",
+  "Gardening",
+  "Appliance Repair",
+  "Pest Control",
+];
+
+// Replace with your actual Google Geocoding API key
+const GOOGLE_API_KEY = "AIzaSyCDm-q6ndRI_Sm40AWx8y3E7tDtMiigjxo";
 
 const CreateServicePage = () => {
   const { user, isAuthenticated } = useAuth();
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     skills: [""],
     location: {
@@ -27,6 +45,59 @@ const CreateServicePage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [geolocationError, setGeolocationError] = useState("");
+  const autocompleteRef = useRef(null);
+
+  // Initialize Google Places Autocomplete
+  useEffect(() => {
+    const loadGoogleScript = () => {
+      const script = document.createElement("script");
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_API_KEY}&libraries=places`;
+      script.async = true;
+      script.defer = true;
+      script.onload = initAutocomplete;
+      document.head.appendChild(script);
+    };
+
+    const initAutocomplete = () => {
+      if (window.google && window.google.maps && window.google.maps.places) {
+        const autocomplete = new window.google.maps.places.Autocomplete(
+          autocompleteRef.current,
+          { types: ["address"] }
+        );
+        autocomplete.addListener("place_changed", () => {
+          const place = autocomplete.getPlace();
+          if (place.geometry) {
+            setFormData((prev) => ({
+              ...prev,
+              location: {
+                coordinates: [
+                  place.geometry.location.lng().toString(),
+                  place.geometry.location.lat().toString(),
+                ],
+                address: place.formatted_address,
+              },
+            }));
+            setGeolocationError("");
+          } else {
+            setError("Please select a valid address from the suggestions");
+          }
+        });
+      } else {
+        setError("Google Maps API failed to load. Please try again later.");
+      }
+    };
+
+    loadGoogleScript();
+
+    return () => {
+      // Clean up script
+      const scripts = document.querySelectorAll(
+        'script[src*="maps.googleapis.com"]'
+      );
+      scripts.forEach((script) => script.remove());
+    };
+  }, []);
 
   // Check if user is authenticated
   if (!isAuthenticated) {
@@ -40,7 +111,7 @@ const CreateServicePage = () => {
             Please log in to create a provider profile.
           </p>
           <button
-            onClick={() => navigate("/login")} // Use navigate instead of window.location.href
+            onClick={() => navigate("/login")}
             className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
           >
             Go to Login
@@ -50,7 +121,68 @@ const CreateServicePage = () => {
     );
   }
 
-  // Rest of the code remains unchanged
+  // Handle getting current location
+  const handleGetCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setFormData((prev) => ({
+            ...prev,
+            location: {
+              ...prev.location,
+              coordinates: [longitude.toString(), latitude.toString()],
+            },
+          }));
+          setGeolocationError("");
+          // Fetch address using reverse geocoding
+          fetchAddressFromCoordinates(latitude, longitude);
+        },
+        (error) => {
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              setGeolocationError("Permission to access location was denied.");
+              break;
+            case error.POSITION_UNAVAILABLE:
+              setGeolocationError("Location information is unavailable.");
+              break;
+            case error.TIMEOUT:
+              setGeolocationError("The request to get location timed out.");
+              break;
+            default:
+              setGeolocationError("An unknown error occurred.");
+              break;
+          }
+        }
+      );
+    } else {
+      setGeolocationError("Geolocation is not supported by this browser.");
+    }
+  };
+
+  // Fetch address using reverse geocoding with Geocoding API
+  const fetchAddressFromCoordinates = async (lat, lng) => {
+    try {
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${GOOGLE_API_KEY}`
+      );
+      const data = await response.json();
+      if (data.status === "OK" && data.results[0]) {
+        setFormData((prev) => ({
+          ...prev,
+          location: {
+            ...prev.location,
+            address: data.results[0].formatted_address,
+          },
+        }));
+      } else {
+        setGeolocationError("Unable to fetch address for the location.");
+      }
+    } catch (err) {
+      setGeolocationError("Error fetching address. Please try again.");
+    }
+  };
+
   const handleInputChange = (field, value, index = null, subField = null) => {
     setFormData((prev) => {
       const newData = { ...prev };
@@ -123,25 +255,25 @@ const CreateServicePage = () => {
     setError("");
     const hasValidSkills = formData.skills.some((skill) => skill.trim() !== "");
     if (!hasValidSkills) {
-      setError("Please add at least one skill");
+      setError("Please select at least one skill");
       return false;
     }
     if (!formData.location.address.trim()) {
-      setError("Please enter an address");
+      setError("Please enter or select an address");
       return false;
     }
     if (
       !formData.location.coordinates[0] ||
       !formData.location.coordinates[1]
     ) {
-      setError("Please enter both longitude and latitude coordinates");
+      setError("Please enter or fetch both longitude and latitude coordinates");
       return false;
     }
     const hasValidPricing = formData.pricing.some(
       (p) => p.service.trim() && p.price
     );
     if (!hasValidPricing) {
-      setError("Please add at least one service with pricing");
+      setError("Please select at least one service with pricing");
       return false;
     }
     const hasValidAvailability = formData.availability.some(
@@ -191,7 +323,7 @@ const CreateServicePage = () => {
           "Provider profile created successfully! Awaiting admin approval."
         );
         setTimeout(() => {
-          navigate("/provider-dashboard"); // Use navigate instead of window.location.href
+          navigate("/provider-dashboard");
         }, 2000);
       }
     } catch (error) {
@@ -203,7 +335,7 @@ const CreateServicePage = () => {
   };
 
   const goBack = () => {
-    navigate(-1); // Use navigate instead of window.history.back
+    navigate(-1);
   };
 
   return (
@@ -257,6 +389,11 @@ const CreateServicePage = () => {
               <p className="text-green-700 text-sm">{success}</p>
             </div>
           )}
+          {geolocationError && (
+            <div className="mx-8 mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p className="text-yellow-700 text-sm">{geolocationError}</p>
+            </div>
+          )}
 
           {/* Form Body */}
           <div className="px-8 py-8 space-y-8">
@@ -272,20 +409,27 @@ const CreateServicePage = () => {
                 <span className="text-red-500 text-sm">*</span>
               </div>
               <p className="text-gray-600 text-sm ml-10">
-                Add your professional skills and areas of expertise
+                Select your professional skills and areas of expertise
               </p>
               <div className="ml-10 space-y-3">
                 {formData.skills.map((skill, index) => (
                   <div key={index} className="flex items-center space-x-3">
-                    <input
-                      type="text"
+                    <select
                       value={skill}
                       onChange={(e) =>
                         handleInputChange("skills", e.target.value, index)
                       }
-                      placeholder="e.g., Plumbing, Electrical Work, HVAC"
                       className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
+                    >
+                      <option value="" disabled>
+                        Select a skill
+                      </option>
+                      {serviceTypes.map((service) => (
+                        <option key={service} value={service}>
+                          {service}
+                        </option>
+                      ))}
+                    </select>
                     <button
                       onClick={() => removeSkill(index)}
                       disabled={formData.skills.length === 1}
@@ -329,6 +473,7 @@ const CreateServicePage = () => {
                   </label>
                   <input
                     type="text"
+                    ref={autocompleteRef}
                     value={formData.location.address}
                     onChange={(e) =>
                       handleInputChange(
@@ -341,6 +486,13 @@ const CreateServicePage = () => {
                     placeholder="123 Main Street, City, State, ZIP Code"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
+                  <button
+                    onClick={handleGetCurrentLocation}
+                    className="mt-2 flex items-center space-x-2 text-blue-600 hover:text-blue-700 font-medium"
+                  >
+                    <Navigation className="h-4 w-4" />
+                    <span>Use Current Location</span>
+                  </button>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -401,7 +553,7 @@ const CreateServicePage = () => {
                 <span className="text-red-500 text-sm">*</span>
               </div>
               <p className="text-gray-600 text-sm ml-10">
-                Define your services and their respective prices
+                Select your services and their respective prices
               </p>
               <div className="ml-10 space-y-4">
                 {formData.pricing.map((pricing, index) => (
@@ -411,8 +563,7 @@ const CreateServicePage = () => {
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Service Name
                         </label>
-                        <input
-                          type="text"
+                        <select
                           value={pricing.service}
                           onChange={(e) =>
                             handleInputChange(
@@ -422,9 +573,17 @@ const CreateServicePage = () => {
                               "service"
                             )
                           }
-                          placeholder="e.g., Kitchen Sink Repair"
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
+                        >
+                          <option value="" disabled>
+                            Select a service
+                          </option>
+                          {serviceTypes.map((service) => (
+                            <option key={service} value={service}>
+                              {service}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
