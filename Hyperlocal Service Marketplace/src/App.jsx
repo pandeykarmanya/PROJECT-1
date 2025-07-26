@@ -23,12 +23,11 @@ function App() {
       <Header />
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/services" element={<Services />} />
         <Route path="/booking" element={<BookingPage />} />
         <Route path="/payment" element={<PaymentPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/all-service" element={<AllServicesPage/>} />
+        <Route path="/services" element={<AllServicesPage/>} />
 
         <Route
           path="/create-service"

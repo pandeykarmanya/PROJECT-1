@@ -18,11 +18,5 @@ router.get("/skills", providerController.getAvailableSkills);
 router.get("/search", providerController.searchProviders);
 router.get("/:providerId", providerController.getProviderById);
 
-// Admin route to approve/reject provider
-router.post(
-  "/approve-reject",
-  isAuthenticated,
-  providerController.approveOrRejectProvider
-);
 
 module.exports = router;

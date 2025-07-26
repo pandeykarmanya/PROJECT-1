@@ -206,50 +206,6 @@ exports.getProviderById = async (req, res) => {
   }
 };
 
-// Admin: Approve or reject provider
-exports.approveOrRejectProvider = async (req, res) => {
-  try {
-    const { providerId, status } = req.body;
-    const userId = req.user.id;
-
-    // Check if user is admin
-    const user = await User.findById(userId);
-    if (!user || user.role !== "admin") {
-      return res
-        .status(403)
-        .json({ message: "User is not authorized as admin" });
-    }
-
-    // Find provider
-    const provider = await Provider.findById(providerId);
-    if (!provider) {
-      return res.status(404).json({ message: "Provider not found" });
-    }
-
-    // Validate status
-    if (!["approved", "rejected"].includes(status)) {
-      return res
-        .status(400)
-        .json({ message: "Invalid status. Use 'approved' or 'rejected'" });
-    }
-
-    provider.status = status;
-    await provider.save();
-
-    res.status(200).json({
-      success: true,
-      message: `Provider ${status} successfully`,
-      provider: {
-        id: provider._id,
-        userId: provider.userId,
-        status: provider.status,
-      },
-    });
-  } catch (error) {
-    console.error("Approve/reject provider error:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-};
 
 
 exports.getAllProviders = async (req, res) => {

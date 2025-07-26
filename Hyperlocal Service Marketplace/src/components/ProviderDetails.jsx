@@ -19,7 +19,6 @@ const ProviderDetailsModal = ({ providerId, isOpen, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-
   useEffect(() => {
     if (isOpen && providerId) {
       fetchProviderDetails();
@@ -63,19 +62,19 @@ const ProviderDetailsModal = ({ providerId, isOpen, onClose }) => {
         </div>
 
         {/* Content */}
-        <div className="overflow-y-auto max-h-[calc(90vh-140px)]">
+        <div className="overflow-y-auto max-h-[calc(90vh-120px)]">
           {loading ? (
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
             </div>
           ) : error ? (
-            <div className="p-6">
+            <div className="p-4">
               <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                 <p className="text-red-700">{error}</p>
               </div>
             </div>
           ) : provider ? (
-            <div className="p-6 space-y-8">
+            <div className="p-4 space-y-6">
               {/* Provider Info */}
               <div className="flex items-start space-x-6">
                 <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
@@ -217,19 +216,19 @@ const ProviderDetailsModal = ({ providerId, isOpen, onClose }) => {
 
         {/* Footer */}
         {provider && (
-          <div className="border-t border-gray-200 p-6">
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-medium transition-colors flex items-center justify-center">
+          <div className="border-t border-gray-200 p-2 mt-[-10px]">
+            <div className="flex flex-col sm:flex-row gap-1 justify-center sm:justify-between">
+              <button className="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-medium transition-colors flex items-center justify-center">
                 <Phone className="h-4 w-4 mr-2" />
                 Contact Provider
               </button>
-              <button className="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-medium transition-colors flex items-center justify-center">
+              <button className="w-full sm:w-auto bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 font-medium transition-colors flex items-center justify-center">
                 <Calendar className="h-4 w-4 mr-2" />
                 Book Service
               </button>
               <button
                 onClick={onClose}
-                className="flex-1 bg-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-400 font-medium transition-colors"
+                className="w-full sm:w-auto bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 font-medium transition-colors"
               >
                 Close
               </button>
