@@ -250,3 +250,246 @@ exports.approveOrRejectProvider = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
+
+exports.getAllProviders = async (req, res) => {
+  try {
+    const {
+      skill,
+      location,
+      radius = 50, // Default radius in km
+      minPrice,
+      maxPrice,
+      page = 1,
+      limit = 10,
+      sortBy = "createdAt",
+      sortOrder = "desc",
+    } = req.query;
+
+    // Build filter object
+    const filter = {
+      status: "approved",
+      isActive: true,
+    };
+
+    // Add skill filter if provided
+    if (skill) {
+      filter.skills = { $in: [skill] };
+    }
+
+    // Add price filter if provided
+    if (minPrice || maxPrice) {
+      const priceFilter = {};
+      if (minPrice) priceFilter.$gte = parseFloat(minPrice);
+      if (maxPrice) priceFilter.$lte = parseFloat(maxPrice);
+      filter["pricing.price"] = priceFilter;
+    }
+
+    // Build aggregation pipeline
+    let aggregationPipeline = [{ $match: filter }];
+
+    // Add location-based filtering if coordinates provided
+    if (location) {
+      const coordinates = location
+        .split(",")
+        .map((coord) => parseFloat(coord.trim()));
+      if (coordinates.length === 2) {
+        aggregationPipeline.unshift({
+          $geoNear: {
+            near: {
+              type: "Point",
+              coordinates: coordinates, // [longitude, latitude]
+            },
+            distanceField: "distance",
+            maxDistance: radius * 1000, // Convert km to meters
+            spherical: true,
+          },
+        });
+      }
+    }
+
+    // Add population and projection
+    aggregationPipeline.push(
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      {
+        $unwind: "$user",
+      },
+      {
+        $project: {
+          _id: 1,
+          userId: 1,
+          skills: 1,
+          location: 1,
+          pricing: 1,
+          availability: 1,
+          rating: 1,
+          totalReviews: 1,
+          totalJobs: 1,
+          createdAt: 1,
+          distance: { $ifNull: ["$distance", null] },
+          user: {
+            name: "$user.name",
+            email: "$user.email",
+          },
+        },
+      }
+    );
+
+    // Add sorting
+    const sortOptions = {};
+    sortOptions[sortBy] = sortOrder === "desc" ? -1 : 1;
+    aggregationPipeline.push({ $sort: sortOptions });
+
+    // Execute aggregation
+    const providers = await Provider.aggregate(aggregationPipeline);
+
+    // Apply pagination
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+    const paginatedProviders = providers.slice(startIndex, endIndex);
+
+    // Get total count for pagination
+    const totalProviders = providers.length;
+    const totalPages = Math.ceil(totalProviders / limit);
+
+    res.status(200).json({
+      success: true,
+      data: paginatedProviders,
+      pagination: {
+        currentPage: parseInt(page),
+        totalPages,
+        totalProviders,
+        hasNextPage: endIndex < totalProviders,
+        hasPrevPage: startIndex > 0,
+      },
+      filters: {
+        skill,
+        location,
+        radius,
+        minPrice,
+        maxPrice,
+      },
+    });
+  } catch (error) {
+    console.error("Get all providers error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// Get all unique skills from approved providers
+exports.getAvailableSkills = async (req, res) => {
+  try {
+    const skills = await Provider.aggregate([
+      {
+        $match: {
+          status: "approved",
+          isActive: true,
+        },
+      },
+      {
+        $unwind: "$skills",
+      },
+      {
+        $group: {
+          _id: "$skills",
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { count: -1 },
+      },
+      {
+        $project: {
+          skill: "$_id",
+          count: 1,
+          _id: 0,
+        },
+      },
+    ]);
+
+    res.status(200).json({
+      success: true,
+      skills,
+    });
+  } catch (error) {
+    console.error("Get available skills error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// Search providers by text
+exports.searchProviders = async (req, res) => {
+  try {
+    const { query, page = 1, limit = 10 } = req.query;
+
+    if (!query) {
+      return res.status(400).json({ message: "Search query is required" });
+    }
+
+    const searchRegex = new RegExp(query, "i");
+
+    const providers = await Provider.find({
+      status: "approved",
+      isActive: true,
+      $or: [
+        { skills: { $in: [searchRegex] } },
+        { "location.address": searchRegex },
+        { "pricing.service": searchRegex },
+      ],
+    })
+      .populate("userId", "name email")
+      .sort({ rating: -1, totalReviews: -1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
+
+    const totalProviders = await Provider.countDocuments({
+      status: "approved",
+      isActive: true,
+      $or: [
+        { skills: { $in: [searchRegex] } },
+        { "location.address": searchRegex },
+        { "pricing.service": searchRegex },
+      ],
+    });
+
+    const totalPages = Math.ceil(totalProviders / limit);
+
+    res.status(200).json({
+      success: true,
+      data: providers.map((provider) => ({
+        id: provider._id,
+        userId: provider.userId._id,
+        user: {
+          name: provider.userId.name,
+          email: provider.userId.email,
+        },
+        skills: provider.skills,
+        location: provider.location,
+        pricing: provider.pricing,
+        availability: provider.availability,
+        rating: provider.rating,
+        totalReviews: provider.totalReviews,
+        totalJobs: provider.totalJobs,
+        createdAt: provider.createdAt,
+      })),
+      pagination: {
+        currentPage: parseInt(page),
+        totalPages,
+        totalProviders,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+      },
+      searchQuery: query,
+    });
+  } catch (error) {
+    console.error("Search providers error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};

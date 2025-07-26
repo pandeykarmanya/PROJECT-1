@@ -107,6 +107,46 @@ class ApiService {
       body: { providerId, status },
     });
   }
+
+  // New methods for getting all providers with filtering
+  async getAllProviders(filters = {}) {
+    const queryParams = new URLSearchParams();
+
+    Object.keys(filters).forEach((key) => {
+      if (
+        filters[key] !== undefined &&
+        filters[key] !== null &&
+        filters[key] !== ""
+      ) {
+        queryParams.append(key, filters[key]);
+      }
+    });
+
+    const endpoint = `/provider/all${
+      queryParams.toString() ? `?${queryParams.toString()}` : ""
+    }`;
+    return this.request(endpoint, {
+      method: "GET",
+    });
+  }
+
+  async getAvailableSkills() {
+    return this.request("/provider/skills", {
+      method: "GET",
+    });
+  }
+
+  async searchProviders(query, page = 1, limit = 10) {
+    const queryParams = new URLSearchParams({
+      query,
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+
+    return this.request(`/provider/search?${queryParams.toString()}`, {
+      method: "GET",
+    });
+  }
 }
 
 // Create and export a singleton instance

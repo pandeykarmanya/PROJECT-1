@@ -10,6 +10,7 @@ import HomePage from './pages/HomePage';
 import AdminDashboard from './pages/AdminDashboard';
 import ProviderDashboard from "./pages/ProviderDashboard";
 import CreateServicePage from './pages/createServicePage';
+import AllServicesPage from './pages/ServiceDetailsPage';
 import { useAuth } from './hooks/useAuth';
 
 const ProtectedRoute = ({ children }) => {
@@ -27,6 +28,8 @@ function App() {
         <Route path="/payment" element={<PaymentPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/all-service" element={<AllServicesPage/>} />
+
         <Route
           path="/create-service"
           element={
@@ -36,14 +39,14 @@ function App() {
           }
         />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
-              <Route
-        path="/provider-dashboard"
-        element={
-          <ProtectedRoute>
-            <ProviderDashboard />
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path="/provider-dashboard"
+          element={
+            <ProtectedRoute>
+              <ProviderDashboard />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
       <Footer />
     </>
