@@ -387,13 +387,13 @@ const AllServicesPage = () => {
                           </div>
                           <div>
                             <h3 className="font-semibold text-gray-900">
-                              {provider.user?.name}
+                              {provider.user?.name || "Unknown Provider"}
                             </h3>
                             <div className="flex items-center space-x-1">
                               <Star className="h-4 w-4 text-yellow-400 fill-current" />
                               <span className="text-sm text-gray-600">
-                                {provider.rating.toFixed(1)} (
-                                {provider.totalReviews} reviews)
+                                {(provider.rating || 0).toFixed(1)} (
+                                {provider.totalReviews || 0} reviews)
                               </span>
                             </div>
                           </div>
@@ -409,17 +409,19 @@ const AllServicesPage = () => {
                     {/* Skills */}
                     <div className="mb-4">
                       <div className="flex flex-wrap gap-1">
-                        {provider.skills.slice(0, 3).map((skill, index) => (
-                          <span
-                            key={index}
-                            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-                          >
-                            {skill}
-                          </span>
-                        ))}
-                        {provider.skills.length > 3 && (
+                        {(provider.skills || [])
+                          .slice(0, 3)
+                          .map((skill, index) => (
+                            <span
+                              key={index}
+                              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                            >
+                              {skill}
+                            </span>
+                          ))}
+                        {(provider.skills || []).length > 3 && (
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                            +{provider.skills.length - 3} more
+                            +{(provider.skills || []).length - 3} more
                           </span>
                         )}
                       </div>
@@ -429,7 +431,7 @@ const AllServicesPage = () => {
                     <div className="flex items-center text-sm text-gray-600 mb-4">
                       <MapPin className="h-4 w-4 mr-1" />
                       <span className="truncate">
-                        {provider.location.address}
+                        {provider.location?.address || "Location not specified"}
                       </span>
                     </div>
 
@@ -439,22 +441,24 @@ const AllServicesPage = () => {
                         Services & Pricing
                       </h4>
                       <div className="space-y-1">
-                        {provider.pricing.slice(0, 2).map((service, index) => (
-                          <div
-                            key={index}
-                            className="flex justify-between items-center text-sm"
-                          >
-                            <span className="text-gray-600">
-                              {service.service}
-                            </span>
-                            <span className="font-medium text-gray-900">
-                              {formatPrice(service.price)}
-                            </span>
-                          </div>
-                        ))}
-                        {provider.pricing.length > 2 && (
+                        {(provider.pricing || [])
+                          .slice(0, 2)
+                          .map((service, index) => (
+                            <div
+                              key={index}
+                              className="flex justify-between items-center text-sm"
+                            >
+                              <span className="text-gray-600">
+                                {service.service}
+                              </span>
+                              <span className="font-medium text-gray-900">
+                                {formatPrice(service.price)}
+                              </span>
+                            </div>
+                          ))}
+                        {(provider.pricing || []).length > 2 && (
                           <p className="text-xs text-gray-500">
-                            +{provider.pricing.length - 2} more services
+                            +{(provider.pricing || []).length - 2} more services
                           </p>
                         )}
                       </div>
@@ -464,12 +468,12 @@ const AllServicesPage = () => {
                     <div className="flex justify-between text-sm text-gray-600 mb-4">
                       <div className="flex items-center">
                         <Briefcase className="h-4 w-4 mr-1" />
-                        <span>{provider.totalJobs} jobs completed</span>
+                        <span>{provider.totalJobs || 0} jobs completed</span>
                       </div>
                       <div className="flex items-center">
                         <Clock className="h-4 w-4 mr-1" />
                         <span>
-                          Available {provider.availability.length} days
+                          Available {(provider.availability || []).length} days
                         </span>
                       </div>
                     </div>

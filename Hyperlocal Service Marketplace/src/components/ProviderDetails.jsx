@@ -91,7 +91,7 @@ const ProviderDetailsModal = ({ providerId, isOpen, onClose }) => {
                     <div className="flex items-center space-x-1">
                       <Star className="h-5 w-5 text-yellow-400 fill-current" />
                       <span className="font-semibold">
-                        {provider.rating.toFixed(1)}
+                        {(provider.rating || 0).toFixed(1)}
                       </span>
                       <span className="text-gray-600">
                         ({provider.totalReviews} reviews)
