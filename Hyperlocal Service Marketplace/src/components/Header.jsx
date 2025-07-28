@@ -13,6 +13,9 @@ export default function Header() {
     console.log("Searching for:", query);
   };
 
+  // Check if user is authenticated and not a provider
+  const isAuthenticatedUser = user && (!user.role || user.role !== "provider");
+
   return (
     <header className="bg-black shadow-md fixed top-0 w-full z-50">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-5">
@@ -45,13 +48,15 @@ export default function Header() {
             Services
             <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-[#FE5E41] transition-all duration-300 group-hover:w-full"></span>
           </Link>
-          <Link
-            to="/my-bookings"
-            className="relative group hover:text-[#FE5E41] transition"
-          >
-           My Booking
-            <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-[#FE5E41] transition-all duration-300 group-hover:w-full"></span>
-          </Link>
+          {isAuthenticatedUser && (
+            <Link
+              to="/my-bookings"
+              className="relative group hover:text-[#FE5E41] transition"
+            >
+              My Booking
+              <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-[#FE5E41] transition-all duration-300 group-hover:w-full"></span>
+            </Link>
+          )}
         </div>
 
         {/* RIGHT: Search and Profile */}
