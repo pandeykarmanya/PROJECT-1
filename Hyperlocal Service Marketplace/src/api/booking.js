@@ -58,9 +58,9 @@ class BookingApiService {
     }
   }
 
-  // Create Razorpay order
+  // Create Razorpay order - FIXED ENDPOINT
   async createOrder(bookingData) {
-    return this.request("", {
+    return this.request("/create-order", {
       method: "POST",
       body: bookingData,
     });

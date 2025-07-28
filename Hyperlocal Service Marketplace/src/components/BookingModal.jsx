@@ -124,11 +124,13 @@ const BookingModal = ({ provider, isOpen, onClose, onBookingSuccess }) => {
         throw new Error("Please fill in all required fields");
       }
 
-      // Create order
-      const bookingData = {
-        providerId: provider._id,
-        ...formData,
-      };
+        // Create order
+console.log("Provider ID:", provider._id);
+const bookingData = {
+  providerId: provider._id,
+  ...formData,
+};
+console.log("Booking Data:", bookingData);;
 
       const orderResponse = await bookingApiService.createOrder(bookingData);
 

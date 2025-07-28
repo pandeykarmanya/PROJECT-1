@@ -45,6 +45,13 @@ export default function Header() {
             Services
             <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-[#FE5E41] transition-all duration-300 group-hover:w-full"></span>
           </Link>
+          <Link
+            to="/my-bookings"
+            className="relative group hover:text-[#FE5E41] transition"
+          >
+           My Booking
+            <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-[#FE5E41] transition-all duration-300 group-hover:w-full"></span>
+          </Link>
         </div>
 
         {/* RIGHT: Search and Profile */}

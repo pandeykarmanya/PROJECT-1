@@ -4,7 +4,14 @@ const router = express.Router();
 const { isAuthenticated } = require("../middleware/auth");
 const bookingController = require("../controllers/bookingController");
 
-// Create Razorpay order
+// Add logging middleware for debugging
+router.use((req, res, next) => {
+  console.log(`📋 Booking Route: ${req.method} ${req.originalUrl}`);
+  console.log(`📋 Body:`, req.body);
+  next();
+});
+
+// Create Razorpay order - MAIN ENDPOINT
 router.post("/create-order", isAuthenticated, bookingController.createOrder);
 
 // Verify payment
