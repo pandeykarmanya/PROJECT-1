@@ -12,10 +12,18 @@ console.log("✅ Auth routes loaded");
 
 let providerRoutes;
 try {
-  providerRoutes = require("./routes/providerRoute"); // ✅ FIXED
+  providerRoutes = require("./routes/providerRoute");
   console.log("✅ Provider routes imported");
 } catch (err) {
   console.error("❌ Failed to import providerRoute.js:", err);
+}
+
+let bookingRoutes;
+try {
+  bookingRoutes = require("./routes/bookingRoutes");
+  console.log("✅ Booking routes imported");
+} catch (err) {
+  console.error("❌ Failed to import bookingRoutes.js:", err);
 }
 
 // Initialize app
@@ -45,6 +53,7 @@ app.use((req, res, next) => {
   console.log(`➡️ ${req.method} ${req.originalUrl}`);
   next();
 });
+
 // Routes
 app.use("/api/auth", authRoutes);
 console.log("✅ Mounted /api/auth");
@@ -54,6 +63,13 @@ if (providerRoutes) {
   console.log("✅ Mounted /api/provider");
 } else {
   console.warn("⚠️ providerRoutes not mounted");
+}
+
+if (bookingRoutes) {
+  app.use("/api/booking", bookingRoutes);
+  console.log("✅ Mounted /api/booking");
+} else {
+  console.warn("⚠️ bookingRoutes not mounted");
 }
 
 // Error handler

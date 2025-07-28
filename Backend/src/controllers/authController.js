@@ -8,7 +8,7 @@ const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS, // This should be your Gmail App Password
+    pass: process.env.EMAIL_PASS,
   },
   tls: {
     rejectUnauthorized: false,
@@ -186,8 +186,7 @@ exports.resendOTP = async (req, res) => {
   }
 };
 
-// Forgot Password - Send OTP
-// Forgot Password - Send OTP
+
 exports.forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -236,7 +235,7 @@ exports.forgotPassword = async (req, res) => {
   }
 };
 
-// Verify Password Reset OTP
+
 exports.verifyPasswordResetOTP = async (req, res) => {
   try {
     const { tempResetId, otp } = req.body;
@@ -374,6 +373,23 @@ exports.googleCallback = (req, res) => {
     res.redirect(
       `${process.env.FRONTEND_URL}/login?error=authentication_failed`
     );
+  }
+};
+
+// Google OAuth callback
+exports.googleCallback = async (req, res) => {
+  try {
+    // User is already authenticated by passport middleware
+    const user = req.user;
+    
+    // Generate JWT token
+    const token = generateToken(user._id);
+    
+    // Redirect to frontend with token (you can modify this URL as needed)
+    res.redirect(`http://localhost:3000/auth/callback?token=${token}`);
+  } catch (error) {
+    console.error("Google callback error:", error);
+    res.status(500).json({ message: "Authentication failed", error: error.message });
   }
 };
 

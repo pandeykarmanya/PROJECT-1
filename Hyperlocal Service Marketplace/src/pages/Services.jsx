@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
 import { useNavigate } from "react-router-dom"
 import { Sparkles, Home, Wrench, Zap, Droplets, Bug, X, Star, Clock, Users, Check, Minus, Calendar } from "lucide-react"
 
